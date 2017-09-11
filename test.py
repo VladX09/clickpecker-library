@@ -1,6 +1,6 @@
 import bitstring
 import socket
-import minicap
+from openstf import minicap
 
 class Device:
 
@@ -16,7 +16,6 @@ class Device:
         with socket.socket() as sock:
             sock.connect(self.minicap_address)
             header = minicap.read_header(sock)
-            print("header: ", header)
             frame_size = bitstring.ConstBitStream(bytes=sock.recv(4))
             return minicap.read_frame(sock)
 
