@@ -32,9 +32,8 @@ def read_header(sock):
             "uint:8",
             "uint:8"]
     version = read_version(sock)
-
-    # TODO: add version checking
-
+    if(version != 1):
+        raise RuntimeError("Unsuppoted minicap version: {}".format(version))
     header = bitstring.ConstBitStream(bytes=sock.recv(23))
     header = header.readlist(bytelist)
     header = [version] + header

@@ -16,9 +16,8 @@ def read_header(sock):
         field = line_arr[0]
         if field == "v":
             version = int(line_arr[1])
-
-            # TODO: add version checking
-
+            if(version != 1):
+                raise RuntimeError("Unsuppoted minitouch version: {}".format(version))
             header["version"] = version
         elif field == "^":
             header["bounds"] = Bounds(*[int(line_arr[i]) for i in range(1,5)])
@@ -30,9 +29,10 @@ def validate(command):
     # TODO: add command validation
     pass
 
-def send_command(sock, command):
-    validate(command)
-    sock.sendall(command)
+def send_commands(sock, command_list):
+    for command in command_list:
+        validate(command)
+        sock.sendall(command)
 
 if __name__ == "__main__":
     address = ("",1111)
