@@ -29,13 +29,3 @@ class Device:
         with socket.socket() as sock:
             sock.connect(self.minitouch_address)
             minitouch.send_commands(sock, movement_list)
-
-def _save_image(img):
-    filename = input("filename [test.jpg]: ")
-    img.save(filename if len(filename) > 0 else "test.jpg")
-
-def _save_image(img, filename):
-    img.save(filename)
-
-if __name__ == "__main__":
-    print("done")
