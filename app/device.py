@@ -1,7 +1,6 @@
 import bitstring
 import socket
-import openstf.minicap
-import openstf.minitouch
+from .openstf import minicap, minitouch
 
 class Device:
 
@@ -37,3 +36,6 @@ def _save_image(img):
 
 def _save_image(img, filename):
     img.save(filename)
+
+if __name__ == "__main__":
+    print("done")
