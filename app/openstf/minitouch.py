@@ -30,13 +30,7 @@ def validate(command):
     pass
 
 def send_commands(sock, command_list):
+    sock.recv(1024)
     for command in command_list:
         validate(command)
-        sock.sendall(command)
-
-if __name__ == "__main__":
-    address = ("",1111)
-    with socket.socket() as sock:
-        sock.connect(address)
-        header = read_header(sock)
-        print(header)
+        sock.sendall((command + "\n").encode("utf-8"))
