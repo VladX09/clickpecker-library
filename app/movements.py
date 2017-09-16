@@ -20,9 +20,9 @@ def wait(time):
 def touch(contact, x, y, pressure, time=0):
     return _concat([down(contact, x, y, pressure),
                    commit(),
+                   wait(time),
                    up(contact),
                    commit(),
-                   wait(time),
                    commit()
     ])
 
