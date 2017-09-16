@@ -4,6 +4,7 @@ import io
 from select import select
 from collections import namedtuple
 import re
+import time
 
 Bounds = namedtuple("Bounds",["max_contacts", "max_x", "max_y", "max_pressure"])
 MinitouchHeader = namedtuple("MinitouchHeader",["version", "bounds", "pid"])
@@ -35,4 +36,8 @@ def send_commands(sock, command_list):
     sock.recv(1024)
     for command in command_list:
         validate(command)
-        sock.sendall((command + "\n").encode("utf-8"))
+        if command[0] == "w":
+            sleep_time = int(command.split(" ")[1])
+            time.sleep(sleep_time)
+        else:
+            sock.sendall((command + "\n").encode("utf-8"))
