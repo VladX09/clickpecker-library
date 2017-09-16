@@ -3,6 +3,7 @@ import bitstring
 import io
 from select import select
 from collections import namedtuple
+import re
 
 Bounds = namedtuple("Bounds",["max_contacts", "max_x", "max_y", "max_pressure"])
 MinitouchHeader = namedtuple("MinitouchHeader",["version", "bounds", "pid"])
@@ -26,8 +27,9 @@ def read_header(sock):
     return(MinitouchHeader(**header))
 
 def validate(command):
-    # TODO: add command validation
-    pass
+    pattern = r"[crdmuw]( [\d]*){0,4}"
+    if re.fullmatch(pattern, command) == None:
+        raise RuntimeError("Wrong minitouch command: {}".format(command))
 
 def send_commands(sock, command_list):
     sock.recv(1024)
