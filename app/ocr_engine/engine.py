@@ -1,0 +1,44 @@
+from PIL import Image
+from . import postprocessing, preprocessing, utils
+from tesserocr import PyTessBaseAPI, RIL, PSM
+from ..namedtuples import Box, ContentBox
+import numpy as np
+
+#TODO: move api settings into **kwargs
+def get_content_boxes(image, level=RIL.WORD, text_only=False,
+                     raw_image=False, predefined_areas=None,
+                     psm=PSM.AUTO):
+    with PyTessBaseAPI(psm=psm) as api:
+        api.SetImage(image)
+        if predefined_areas == None:
+            component_images = api.GetComponentImages(level, text_only,
+                                                      raw_image=raw_image)
+            areas = [[box['x'], box['y'], box['w'], box['h']] for (_,box,_,_) in component_images]
+            width, height = image.size
+            areas = [utils.add_box_paddings(area, width, height) for area in areas]
+            areas = [Box(*area) for area in areas]
+            areas = utils.filter_parent_boxes(areas)
+        else:
+            areas = predefined_areas
+        boxes = []
+        for i, box in enumerate(areas):
+            api.SetRectangle(box.x, box.y, box.w, box.h)
+            text = api.GetUTF8Text()
+            conf = api.MeanTextConf()
+            boxes.append(ContentBox(text, box))
+            # print (u"Box[{0}]: x={box.x}, y={box.y}, w={box.w}, h={box.h}, confidence: {1}, text: {2}"
+            #        .format(i, conf, text, box=box).encode("utf-8"))
+        return boxes
+
+def basic_parse(image,
+                preproc_fun=preprocessing.binary,
+                postproc_fun=postprocessing.basic_postprocessing,
+                **gcb_params):
+    # TODO: add zoom division on postprocessing
+    image = preproc_fun(image)
+    boxes = get_content_boxes(image, **gcb_params)
+    boxes = postproc_fun(boxes)
+    # TODO: add postprocessing: create lines and return center coordinates
+    return boxes
+
+# TODO: add crop_parse
