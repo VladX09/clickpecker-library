@@ -5,9 +5,7 @@ from select import select
 from collections import namedtuple
 import re
 import time
-
-Bounds = namedtuple("Bounds",["max_contacts", "max_x", "max_y", "max_pressure"])
-MinitouchHeader = namedtuple("MinitouchHeader",["version", "bounds", "pid"])
+from ..namedtuples import MinitouchHeader, MinitouchBounds
 
 def read_header(sock):
     data = sock.recv(1024)
@@ -22,7 +20,7 @@ def read_header(sock):
                 raise RuntimeError("Unsuppoted minitouch version: {}".format(version))
             header["version"] = version
         elif field == "^":
-            header["bounds"] = Bounds(*[int(line_arr[i]) for i in range(1,5)])
+            header["bounds"] = MinitouchBounds(*[int(line_arr[i]) ror i in range(1,5)])
         elif field == "$":
             header["pid"] = int(line_arr[1])
     return(MinitouchHeader(**header))
