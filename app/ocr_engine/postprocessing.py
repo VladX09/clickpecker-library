@@ -19,9 +19,10 @@ def replace_ligatures(str):
         str = str.replace(ligature, replacement)
     return str
 
-def basic_postprocessing(content_boxes):
+def basic_postprocessing(content_boxes, zoom=0.5):
     new_boxes = []
     for box in content_boxes:
         new_content = replace_ligatures(box.content).lower().replace(" ","").strip().replace("\n","")
-        new_boxes.append(ContentBox(new_content, box.position))
+        new_position = Box(*[dim * zoom for dim in box.position])
+        new_boxes.append(ContentBox(new_content, new_position))
     return new_boxes
