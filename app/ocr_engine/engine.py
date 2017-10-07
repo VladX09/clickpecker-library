@@ -7,11 +7,11 @@ import numpy as np
 def get_content_boxes(image,
                       level=RIL.WORD, text_only=False,
                       predefined_areas=None,
-                      psm=PSM.AUTO):
+                      psm=PSM.AUTO, **api_params):
     with PyTessBaseAPI(psm=psm) as api:
         api.SetImage(image)
         if predefined_areas == None:
-            areas = _prepare_areas(api, image, level=level, text_only=text_only)
+            areas = _prepare_areas(api, image, level=level, text_only=text_only, **api_params)
         else:
             areas = predefined_areas
         boxes = []
@@ -40,7 +40,16 @@ def basic_parse(image,
     image = preproc_fun(image)
     boxes = get_content_boxes(image, **gcb_params)
     boxes = postproc_fun(boxes)
-    # TODO: add postprocessing: create lines and return center coordinates
     return boxes
 
-# TODO: add crop_parse
+def crop_parse(image, x_range, y_range, **basic_parse_params):
+    width, height = image.size
+    cropped_img = image.crop((x_range[0] * width, y_range[0] * height,
+                              x_range[1] * width, y_range[1] * height))
+    boxes = basic_parse(cropped_img, **basic_parse_params)
+
+    # Transform box coordinates to fit original image
+    scaled_boxes = [ContentBox(box.content, Box(box.position.x + width * x_range[0],
+                                            box.position.y + height * y_range[0],
+                                            box.position.w, box.position.h)) for box in boxes]
+    return scaled_boxes
