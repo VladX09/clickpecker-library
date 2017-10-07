@@ -43,6 +43,7 @@ def basic_parse(image,
     return boxes
 
 def crop_parse(image, x_range, y_range, **basic_parse_params):
+    # x_range and y_range are tuples (min, max), where min and max are from 0 to 1
     width, height = image.size
     cropped_img = image.crop((x_range[0] * width, y_range[0] * height,
                               x_range[1] * width, y_range[1] * height))
