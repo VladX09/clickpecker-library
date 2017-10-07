@@ -1,7 +1,7 @@
 import PIL
 import cv2
 import numpy as np
-from ..namedtuples import Box
+from ..datatypes import Box
 from . import utils
 
 def binary(pil_image, zoom_x=2, zoom_y=2, threshold=200):

@@ -1,5 +1,5 @@
 import itertools
-from ..namedtuples import Box
+from ..datatypes import Box
 
 def _is_parent(box1, box2):
     return ((box1.x <= box2.x)

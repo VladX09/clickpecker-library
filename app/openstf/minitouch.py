@@ -5,7 +5,7 @@ from select import select
 from collections import namedtuple
 import re
 import time
-from ..namedtuples import MinitouchHeader, MinitouchBounds
+from ..datatypes import MinitouchHeader, MinitouchBounds
 
 def read_header(sock):
     data = sock.recv(1024)

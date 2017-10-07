@@ -2,7 +2,7 @@ import bitstring
 import io
 from PIL import Image
 from select import select
-from ..namedtuples import MinicapHeader
+from ..datatypes import MinicapHeader
 
 def read_version(sock):
     return bitstring.ConstBitStream(bytes=sock.recv(1)).uint

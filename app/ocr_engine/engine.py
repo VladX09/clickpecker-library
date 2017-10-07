@@ -1,17 +1,17 @@
 from PIL import Image
 from . import postprocessing, preprocessing, utils
 from tesserocr import PyTessBaseAPI, RIL, PSM
-from ..namedtuples import Box, ContentBox
+from ..datatypes import Box, ContentBox
 import numpy as np
 
-#TODO: move api settings into **kwargs
-def get_content_boxes(image, level=RIL.WORD, text_only=False,
-                     raw_image=False, predefined_areas=None,
-                     psm=PSM.AUTO):
+def get_content_boxes(image,
+                      level=RIL.WORD, text_only=False,
+                      predefined_areas=None,
+                      psm=PSM.AUTO):
     with PyTessBaseAPI(psm=psm) as api:
         api.SetImage(image)
         if predefined_areas == None:
-            areas = _prepare_areaes(api, image, level=level, text_only=text_only, raw_image=raw_image)
+            areas = _prepare_areas(api, image, level=level, text_only=text_only)
         else:
             areas = predefined_areas
         boxes = []
@@ -24,7 +24,7 @@ def get_content_boxes(image, level=RIL.WORD, text_only=False,
             #        .format(i, conf, text, box=box).encode("utf-8"))
         return boxes
 
-def _prepare_areaes(api, image, **api_params):
+def _prepare_areas(api, image, **api_params):
     component_images = api.GetComponentImages(**api_params)
     areas = [[box['x'], box['y'], box['w'], box['h']] for (_,box,_,_) in component_images]
     width, height = image.size

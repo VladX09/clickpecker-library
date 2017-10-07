@@ -1,4 +1,4 @@
-from ..namedtuples import Box, ContentBox
+from ..datatypes import Box, ContentBox
 
 def _get_ligature_replaces():
     ligatures = {"\N{latin capital ligature oe}":"OE",
