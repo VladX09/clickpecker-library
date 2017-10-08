@@ -21,4 +21,4 @@ def add_box_paddings(box_arr, max_width, max_height, paddings_arr=[5,5,10,10]):
     y -= min([dy, y])
     w += min([dw, max_width-w])
     h += min([dh, max_height-w])
-    return [x,y,w,h]
+    return Box(x,y,w,h)

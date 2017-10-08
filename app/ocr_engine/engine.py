@@ -6,14 +6,14 @@ import numpy as np
 
 def get_content_boxes(image,
                       level=RIL.WORD, text_only=False,
-                      predefined_areas=None,
+                      predefined_boxes=None,
                       psm=PSM.AUTO, **api_params):
     with PyTessBaseAPI(psm=psm) as api:
         api.SetImage(image)
-        if predefined_areas == None:
-            areas = _prepare_areas(api, image, level=level, text_only=text_only, **api_params)
+        if predefined_boxes == None:
+            areas = _prepare_boxes(api, image, level=level, text_only=text_only, **api_params)
         else:
-            areas = predefined_areas
+            areas = predefined_boxes
         boxes = []
         for i, box in enumerate(areas):
             api.SetRectangle(box.x, box.y, box.w, box.h)
@@ -24,14 +24,13 @@ def get_content_boxes(image,
             #        .format(i, conf, text, box=box).encode("utf-8"))
         return boxes
 
-def _prepare_areas(api, image, **api_params):
+def _prepare_boxes(api, image, **api_params):
     component_images = api.GetComponentImages(**api_params)
-    areas = [[box['x'], box['y'], box['w'], box['h']] for (_,box,_,_) in component_images]
+    boxes = [Box(**box) for (_,box,_,_) in component_images]
     width, height = image.size
-    areas = [utils.add_box_paddings(area, width, height) for area in areas]
-    areas = [Box(*area) for area in areas]
-    areas = utils.filter_parent_boxes(areas)
-    return areas
+    boxes = [utils.add_box_paddings(box, width, height) for box in boxes]
+    boxes = utils.filter_parent_boxes(boxes)
+    return boxes
 
 def basic_parse(image,
                 preproc_fun=preprocessing.binary,
