@@ -2,7 +2,7 @@ import bitstring
 import io
 from PIL import Image
 from select import select
-from ..datatypes import MinicapHeader
+from ..datatypes import MinicapHeader, MinicapKeys
 
 def read_version(sock):
     return bitstring.ConstBitStream(bytes=sock.recv(1)).uint
@@ -24,7 +24,7 @@ def read_header(sock):
     header = bitstring.ConstBitStream(bytes=sock.recv(23))
     header = header.readlist(bytelist)
     header = [version] + header
-    header = MinicapHeader(**dict(zip(KEYS, header)))
+    header = MinicapHeader(**dict(zip(MinicapKeys, header)))
     return(header)
 
 def read_frame(sock):
