@@ -20,7 +20,7 @@ def read_header(sock):
                 raise RuntimeError("Unsuppoted minitouch version: {}".format(version))
             header["version"] = version
         elif field == "^":
-            header["bounds"] = MinitouchBounds(*[int(line_arr[i]) ror i in range(1,5)])
+            header["bounds"] = MinitouchBounds(*[int(line_arr[i]) for i in range(1,5)])
         elif field == "$":
             header["pid"] = int(line_arr[1])
     return(MinitouchHeader(**header))
