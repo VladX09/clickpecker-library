@@ -29,9 +29,9 @@ def touch(contact, x, y, pressure, time=0):
 def drag(contact, x1, y1, x2, y2, pressure, step):
     start_point = (contact, x1, y1, pressure)
     mov = [down(*start_point), commit()]
-    for i in range(0, 100, step):
-        x = x1 + ((x2 - x1) // 100 * i)
-        y = y1 + ((y2 - y1) // 100 * i)
+    for i in range(0, 1, step):
+        x = x1 + ((x2 - x1) * i)
+        y = y1 + ((y2 - y1) * i)
         new_point = (contact, x, y, pressure)
         mov.append(move(*new_point))
         mov.append(commit())
