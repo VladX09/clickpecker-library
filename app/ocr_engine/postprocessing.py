@@ -30,7 +30,6 @@ def compose_in_lines(content_boxes, threshold=0.6):
         line_box = Box(start_x, start_y, end_x - start_x, end_y - start_y)
         line_content = "".join(["{} ".format(box.content) for box in line]).strip()
         return ContentBox(line_content, line_box)
-
     lines = []
     line = []
     for box in sorted(content_boxes, key=lambda box: box.position.y):
@@ -54,10 +53,7 @@ def compose_in_lines(content_boxes, threshold=0.6):
         line = []
     return lines
 
-def basic_postprocessing(content_boxes, zoom=0.5):
-    new_boxes = []
-    for box in content_boxes:
-        new_content = replace_ligatures(box.content).lower().replace(" ","").strip().replace("\n","")
-        new_position = Box(*[dim * zoom for dim in box.position])
-        new_boxes.append(ContentBox(new_content, new_position))
-    return new_boxes
+def basic_postprocessing(content_boxes):
+    new_content = (replace_ligatures(box.content).lower().replace(" ","").strip().replace("\n","") for box in content_boxes)
+    new_position = (box.position for box in content_boxes)
+    return [ContentBox(*b) for b in zip(new_content,new_position)]

@@ -1,5 +1,5 @@
 import itertools
-from ..datatypes import Box
+from ..datatypes import Box, ContentBox
 
 def _is_parent(box1, box2):
     return ((box1.x <= box2.x)
@@ -22,3 +22,18 @@ def add_box_paddings(box_arr, max_width, max_height, paddings_arr=[5,5,10,10]):
     w += min([dw, max_width-w])
     h += min([dh, max_height-w])
     return Box(x,y,w,h)
+
+def rebase_box(boxes, dx, dy, c_w, c_h, o_w, o_h):
+    # c_w, c_h - croped   width and height
+    # o_w, o_h - original width and height
+    x = (box.position.x * c_w / o_w + dx for box in boxes)
+    y = (box.position.y * c_h / o_h + dy for box in boxes)
+    w = (box.position.w * c_w / o_w for box in boxes)
+    h = (box.position.h * c_h / o_h for box in boxes)
+    positions = (Box(*pos) for pos in zip(x,y,w,h))
+    return [ContentBox(box.content, position) for box, position in zip (boxes, positions)]
+
+def abs_to_rel(boxes, width, height):
+    positions = (box.position for box in boxes)
+    rel_positions = (Box(pos.x / width, pos.y / height, pos.w / width, pos.h / height) for pos in positions)
+    return [ContentBox(box.content, rel_pos) for box,rel_pos in zip(boxes, rel_positions)]

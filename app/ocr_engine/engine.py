@@ -10,6 +10,7 @@ def get_content_boxes(image,
                       psm=PSM.AUTO, **api_params):
     with PyTessBaseAPI(psm=psm) as api:
         api.SetImage(image)
+        width, height = image.size
         if predefined_boxes == None:
             areas = _prepare_boxes(api, image, level=level, text_only=text_only, **api_params)
         else:
@@ -20,9 +21,7 @@ def get_content_boxes(image,
             text = api.GetUTF8Text()
             conf = api.MeanTextConf()
             boxes.append(ContentBox(text, box))
-            # print (u"Box[{0}]: x={box.x}, y={box.y}, w={box.w}, h={box.h}, confidence: {1}, text: {2}"
-            #        .format(i, conf, text, box=box).encode("utf-8"))
-        return boxes
+        return utils.abs_to_rel(boxes, width, height)
 
 def _prepare_boxes(api, image, **api_params):
     component_images = api.GetComponentImages(**api_params)
@@ -43,13 +42,11 @@ def basic_parse(image,
 
 def crop_parse(image, x_range, y_range, **basic_parse_params):
     # x_range and y_range are tuples (min, max), where min and max are from 0 to 1
-    width, height = image.size
-    cropped_img = image.crop((x_range[0] * width, y_range[0] * height,
-                              x_range[1] * width, y_range[1] * height))
+    w, h = image.size
+    cropped_img = image.crop((x_range[0] * w, y_range[0] * h,
+                              x_range[1] * w, y_range[1] * h))
+    crop_w, crop_h = cropped_img.size
     boxes = basic_parse(cropped_img, **basic_parse_params)
 
     # Transform box coordinates to fit original image
-    scaled_boxes = [ContentBox(box.content, Box(box.position.x + width * x_range[0],
-                                            box.position.y + height * y_range[0],
-                                            box.position.w, box.position.h)) for box in boxes]
-    return scaled_boxes
+    return utils.rebase_box(boxes, x_range[0], y_range[0], crop_w, crop_h, w, h)
