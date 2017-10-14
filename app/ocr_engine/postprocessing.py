@@ -56,4 +56,4 @@ def compose_in_lines(content_boxes, threshold=0.6):
 def basic_postprocessing(content_boxes):
     new_content = (replace_ligatures(box.content).lower().replace(" ","").strip().replace("\n","") for box in content_boxes)
     new_position = (box.position for box in content_boxes)
-    return [ContentBox(*b) for b in zip(new_content,new_position)]
+    return compose_in_lines([ContentBox(*b) for b in zip(new_content,new_position)])
