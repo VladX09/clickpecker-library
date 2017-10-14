@@ -32,17 +32,15 @@ def read_header(sock):
     return (header)
 
 
-def read_frame(sock):
+def read_frame(sock, framesize):
     data = b''
     sock.setblocking(False)
     while True:
+        if len(data) >= framesize:
+            break
         rd, _, _ = select([sock], [], [], 0)
         if sock in rd:
-            msg = sock.recv(2)
+            msg = sock.recv(framesize - len(data))
             data += msg
-            if msg == b'' or msg == bytes.fromhex('ff d9'):
-                break
-        else:
-            break
     sock.setblocking(True)
     return Image.open(io.BytesIO(data))
