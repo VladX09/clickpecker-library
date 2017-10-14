@@ -5,7 +5,9 @@ from select import select
 from collections import namedtuple
 import re
 import time
+
 from ..datatypes import MinitouchHeader, MinitouchBounds
+
 
 def read_header(sock):
     data = sock.recv(1024)
@@ -16,19 +18,23 @@ def read_header(sock):
         field = line_arr[0]
         if field == "v":
             version = int(line_arr[1])
-            if(version != 1):
-                raise RuntimeError("Unsuppoted minitouch version: {}".format(version))
+            if (version != 1):
+                raise RuntimeError(
+                    "Unsuppoted minitouch version: {}".format(version))
             header["version"] = version
         elif field == "^":
-            header["bounds"] = MinitouchBounds(*[int(line_arr[i]) for i in range(1,5)])
+            header["bounds"] = MinitouchBounds(
+                * [int(line_arr[i]) for i in range(1, 5)])
         elif field == "$":
             header["pid"] = int(line_arr[1])
-    return(MinitouchHeader(**header))
+    return (MinitouchHeader(**header))
+
 
 def validate(command):
     pattern = r"[crdmuw]( [\d]*){0,4}"
     if re.fullmatch(pattern, command) == None:
         raise RuntimeError("Wrong minitouch command: {}".format(command))
+
 
 def send_commands(sock, command_list):
     sock.recv(1024)
