@@ -3,15 +3,11 @@ import cv2
 from PIL import Image
 from app.datatypes import Box
 
-_DEBUG = False
 def load_template(path):
     cv2_img = cv2.imread(path)
     cv2_img = cv2.cvtColor(cv2_img, cv2.COLOR_BGR2GRAY)
-    cv2_img = cv2.Canny(cv2_img,50,200)
-    if _DEBUG:
-        cv2.imshow("Template", cv2_img)
-        cv2.waitKey(0)
-    return Image.fromarray(cv2_img)
+    cv2_img = cv2.Canny(cv2_img, 50, 200)
+   return Image.fromarray(cv2_img)
 
 def get_match(image, template):
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
