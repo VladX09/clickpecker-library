@@ -2,6 +2,7 @@ from PIL import Image
 from tesserocr import PyTessBaseAPI, RIL, PSM
 import numpy as np
 import functools
+from fuzzywuzzy import fuzz, process
 
 from . import postprocessing, preprocessing, utils
 from ..datatypes import Box, ContentBox
@@ -21,7 +22,7 @@ def get_content_boxes(image,
                 api, image, level=level, text_only=text_only, **api_params)
         else:
             areas = predefined_boxes
-       areas = [
+        areas = [
             box for box in areas
             if functools.reduce(lambda d1, d2: d1 > 0 and d2 > 0, box)
         ]
@@ -43,24 +44,41 @@ def _prepare_boxes(api, image, **api_params):
     return boxes
 
 
-def basic_parse(image,
-                preproc_fun=preprocessing.binary,
-                postproc_fun=postprocessing.basic_postprocessing,
-                **gcb_params):
-    image = preproc_fun(image)
-    boxes = get_content_boxes(image, **gcb_params)
-    boxes = postproc_fun(boxes)
-    return boxes
+def parse(image,
+          x_range=(0, 1),
+          y_range=(0, 1),
+          preproc=preprocessing.binary,
+          postproc=postprocessing.basic_postprocessing,
+          **gcb_params):
 
-
-def crop_parse(image, x_range, y_range, **basic_parse_params):
     # x_range and y_range are tuples (min, max), where min and max are from 0 to 1
     w, h = image.size
-    cropped_img = image.crop((x_range[0] * w, y_range[0] * h, x_range[1] * w,
-                              y_range[1] * h))
+    cropped_img = image.crop((x_range[0] * w, y_range[0] * h,
+                              x_range[1] * w, y_range[1] * h))
     crop_w, crop_h = cropped_img.size
-    boxes = basic_parse(cropped_img, **basic_parse_params)
+
+    preprocesssed_img = preproc(cropped_img)
+    boxes = get_content_boxes(preprocesssed_img, **gcb_params)
+    postprocessed_boxes = postproc(boxes)
 
     # Transform box coordinates to fit original image
-    return utils.rebase_box(boxes, x_range[0], y_range[0], crop_w, crop_h, w,
-                            h)
+    return utils.rebase_box(postprocessed_boxes,
+                            x_range[0], y_range[0],
+                            crop_w, crop_h, w, h)
+
+
+def search_on_image(image,
+                    text,
+                    x_range=(0, 1),
+                    y_range=(0, 1),
+                    similarity=90):
+    boxes = parse(image, x_range, y_range)
+    best_fit = process.extractOne(
+        text, [box.content for box in boxes],
+        scorer=fuzz.UWRatio,
+        score_cutoff=similarity)
+    if (best_fit is not None):
+        print("best_fit: ", best_fit)
+    boxes = [box for box in boxes
+             if box.content == best_fit[0]] if best_fit is not None else []
+    return boxes

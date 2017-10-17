@@ -59,24 +59,13 @@ class Device:
             sock.connect(self.minitouch_address)
             minitouch.send_commands(sock, movement_list)
 
-    def _search_on_image(self, image, text):
-        boxes = engine.basic_parse(image)
-        best_fit = process.extractOne(
-            text, [box.content for box in boxes],
-            scorer=fuzz.UWRatio,
-            score_cutoff=90)
-        if (best_fit is not None):
-            print("best_fit: ", best_fit)
-        boxes = [box for box in boxes if box.content == best_fit[0]
-                 ] if best_fit is not None else []
-        return boxes
+    def search(self, text, x_range=(0,1), y_range=(0,1)):
+        return engine.search_on_image(self.get_screenshot(), text, x_range,
+                                     y_range)
 
-    def search(self, text):
-        return self._search_on_image(self.get_screenshot(), text)
-
-    def find(self, text, action, repeats=1):
+    def find(self, text, action, repeats=1, x_range=(0,1), y_range=(0,1)):
         for repeat in range(0, repeats):
-            boxes = self.search(text)
+            boxes = self.search(text, x_range, y_range)
             if repeat + 1 == repeats:
                 if not boxes:
                     raise (RuntimeError("Text '{}' not found".format(text)))
@@ -84,16 +73,21 @@ class Device:
             if not boxes:
                 action()
 
-    def scroll_for(self, text, scroll_action=Scroll.down, repeats=1):
+    def scroll_for(self,
+                   text,
+                   scroll_action=Scroll.down,
+                   repeats=1,
+                   x_range=(0,1),
+                   y_range=(0,1)):
         _, max_x, max_y, max_pressure = self.minitouch_header.bounds
         movement = scroll_action(max_x, max_y, max_pressure)
         action = partial(self.perform_movement, movement)
-        return self.find(text, action, repeats)
+        return self.find(text, action, repeats, x_range, y_range)
 
-    def wait_for(self, text, timeout):
+    def wait_for(self, text, timeout, x_range=(0,1), y_range=(0,1)):
         start_time = time.time()
         while (time.time() - start_time < timeout):
-            boxes = self.search(text)
+            boxes = self.search(text, x_range, y_range)
             if boxes:
                 break
         if not boxes:
@@ -103,9 +97,9 @@ class Device:
     def _get_box_center(self, box, max_x, max_y):
         return ((box.x + box.w / 2) * max_x, (box.y + box.h / 2) * max_y)
 
-    def tap(self, text, timeout=60, index=0):
+    def tap(self, text, timeout=60, index=0, x_range=(0,1), y_range=(0,1)):
         _, max_x, max_y, max_pressure = self.minitouch_header.bounds
-        boxes = self.wait_for(text, timeout)
+        boxes = self.wait_for(text, timeout, x_range, y_range)
         box = boxes[index].position
         box_center = self._get_box_center(box, max_x, max_y)
         self.perform_movement(
