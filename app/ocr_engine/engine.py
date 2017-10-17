@@ -1,6 +1,7 @@
 from PIL import Image
 from tesserocr import PyTessBaseAPI, RIL, PSM
 import numpy as np
+import functools
 
 from . import postprocessing, preprocessing, utils
 from ..datatypes import Box, ContentBox
@@ -20,6 +21,10 @@ def get_content_boxes(image,
                 api, image, level=level, text_only=text_only, **api_params)
         else:
             areas = predefined_boxes
+       areas = [
+            box for box in areas
+            if functools.reduce(lambda d1, d2: d1 > 0 and d2 > 0, box)
+        ]
         boxes = []
         for i, box in enumerate(areas):
             api.SetRectangle(box.x, box.y, box.w, box.h)
