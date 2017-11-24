@@ -4,23 +4,6 @@ from math import floor
 _concat = partial(reduce, (lambda x, y: x + y))
 
 
-# TODO: add relative X or Y position
-class Scroll:
-    def up(max_x, max_y, max_pressure):
-        return drag(0, max_x / 2, max_y * 0.2, max_x / 2, max_y * 0.8,
-                    max_pressure / 4, 90)
-
-    def down(max_x, max_y, max_pressure):
-        return drag(0, max_x / 2, max_y * 0.8, max_x / 2, max_y * 0.2,
-                    max_pressure / 4, 90)
-
-    def left(max_x, max_y, max_pressure):
-        return drag(0, 0, max_y / 2, max_x, max_y / 2, max_pressure / 4, 90)
-
-    def right(max_x, max_y, max_pressure):
-        return drag(0, max_x, max_y / 2, 0, max_y / 2, max_pressure / 4, 90)
-
-
 def commit():
     return ["c"]
 
@@ -73,3 +56,11 @@ def drag(contact, x1, y1, x2, y2, pressure, step):
     mov.append(up(contact))
     mov.append(commit())
     return _concat(mov)
+
+
+def scroll(minitouch_bounds, from_point_rel, to_point_rel):
+    _, max_x, max_y, max_pressure = minitouch_bounds
+    max_point = [max_x, max_y]
+    from_point_abs = [i * j for i, j in zip(from_point_rel, max_point)]
+    to_point_abs = [i * j for i, j in zip(to_point_rel, max_point)]
+    return drag(0, *from_point_abs, *to_point_abs, max_pressure / 4, 90)
