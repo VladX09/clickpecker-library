@@ -4,6 +4,23 @@ from math import floor
 _concat = partial(reduce, (lambda x, y: x + y))
 
 
+# TODO: add relative X or Y position
+class Scroll:
+    def up(max_x, max_y, max_pressure):
+        return drag(0, max_x / 2, max_y * 0.2, max_x / 2, max_y * 0.8,
+                    max_pressure / 4, 90)
+
+    def down(max_x, max_y, max_pressure):
+        return drag(0, max_x / 2, max_y * 0.8, max_x / 2, max_y * 0.2,
+                    max_pressure / 4, 90)
+
+    def left(max_x, max_y, max_pressure):
+        return drag(0, 0, max_y / 2, max_x, max_y / 2, max_pressure / 4, 90)
+
+    def right(max_x, max_y, max_pressure):
+        return drag(0, max_x, max_y / 2, 0, max_y / 2, max_pressure / 4, 90)
+
+
 def commit():
     return ["c"]
 

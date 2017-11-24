@@ -112,6 +112,6 @@ class Device:
         self.perform_movement(
             movements.touch(0, *box_center, max_pressure / 4))
 
-    def adb(self, command):
+   def adb(self, command):
         command = "adb -s {0} {1}".format(self.adb_id, command)
         return subprocess.run(command.split(" "), stdout=subprocess.PIPE)
