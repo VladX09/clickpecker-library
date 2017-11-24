@@ -6,7 +6,10 @@ from collections import namedtuple
 import re
 import time
 
-from ..datatypes import MinitouchHeader, MinitouchBounds
+MinitouchBounds = namedtuple(
+    "MinitouchBounds", ["max_contacts", "max_x", "max_y", "max_pressure"])
+
+MinitouchHeader = namedtuple("MinitouchHeader", ["version", "bounds", "pid"])
 
 
 def read_header(sock):

@@ -6,11 +6,6 @@ import socket
 from clickpecker.openstf import minicap, minitouch
 from clickpecker import movements
 
-MinitouchBounds = namedtuple(
-    "MinitouchBounds", ["max_contacts", "max_x", "max_y", "max_pressure"])
-MinitouchHeader = namedtuple("MinitouchHeader", ["version", "bounds", "pid"])
-MinicapHeader = namedtuple("MinicapHeader", minicap.MinicapKeys)
-
 
 def _get_minicap_header(url, minicap_port):
     with socket.socket() as sock:

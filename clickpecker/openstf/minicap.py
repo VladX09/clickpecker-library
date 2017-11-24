@@ -3,12 +3,13 @@ import io
 from PIL import Image
 from select import select
 
-from ..datatypes import MinicapHeader
-
 MinicapKeys = [
     "version", "header_size", "pid", "real_width", "real_height",
     "virtual_width", "virtual_height", "orientation", "quirk"
 ]
+
+MinicapHeader = namedtuple("MinicapHeader", MinicapKeys)
+
 
 def read_version(sock):
     return bitstring.ConstBitStream(bytes=sock.recv(1)).uint
