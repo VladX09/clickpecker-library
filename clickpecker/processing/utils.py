@@ -1,6 +1,6 @@
 import itertools
 
-from ..datatypes import Box, ContentBox
+from clickpecker.models.immutable import Box, ContentBox
 
 
 def _is_parent(box1, box2):
@@ -52,3 +52,7 @@ def abs_to_rel(boxes, width, height):
         ContentBox(box.content, rel_pos)
         for box, rel_pos in zip(boxes, rel_positions)
     ]
+
+
+def get_box_center(box, max_x, max_y):
+    return ((box.x + box.w / 2) * max_x, (box.y + box.h / 2) * max_y)

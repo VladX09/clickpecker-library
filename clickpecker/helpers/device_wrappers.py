@@ -4,7 +4,6 @@ import subprocess
 import socket
 
 from clickpecker.openstf import minicap, minitouch
-from clickpecker import movements
 
 
 def _get_minicap_header(url, minicap_port):
@@ -19,7 +18,7 @@ def _get_minitouch_header(url, minitouch_port):
         return minitouch.read_header(sock)
 
 
-class DeviceHelper(object):
+class DeviceWrapper(object):
     def __init__(self, device, url=""):
         self.device = device
         self.device_url = url

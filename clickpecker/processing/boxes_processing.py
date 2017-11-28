@@ -18,10 +18,25 @@ def _get_ligature_replaces():
     return ligatures
 
 
-def replace_ligatures(str):
+def _replace_ligatures_in_string(s):
     for ligature, replacement in _get_ligature_replaces().items():
-        str = str.replace(ligature, replacement)
-    return str
+        s = s.replace(ligature, replacement)
+    return s
+
+
+def replace_ligatures(content_boxes):
+    content = (box.content for box in content_boxes)
+    positions = (box.position for box in content_boxes)
+    new_content = (_replace_ligatures_in_string(s) for s in content)
+    return [ContentBox(*b) for b in zip(new_content, positions)]
+
+
+def filter_junk(content_boxes):
+    content = (box.content for box in content_boxes)
+    positions = (box.position for box in content_boxes)
+    new_content = (s.lower().replace(" ", "").strip().replace("\n", "")
+                   for s in content)
+    return [ContentBox(*b) for b in zip(new_content, positions)]
 
 
 def compose_in_lines(content_boxes, threshold=0.6):
@@ -61,8 +76,4 @@ def compose_in_lines(content_boxes, threshold=0.6):
 
 
 def basic_postprocessing(content_boxes):
-    new_content = (replace_ligatures(box.content).lower().replace(" ", "")
-                   .strip().replace("\n", "") for box in content_boxes)
-    new_position = (box.position for box in content_boxes)
-    return compose_in_lines(
-        [ContentBox(*b) for b in zip(new_content, new_position)])
+    return compose_in_lines(filter_junk(replace_ligatures(content_boxes)))

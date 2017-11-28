@@ -1,8 +1,9 @@
 import numpy as np
 import cv2
+
 from PIL import Image
 
-from app.datatypes import Box
+from clickpecker.models.immutable import Box
 
 
 def load_template(path):
@@ -13,6 +14,7 @@ def load_template(path):
 
 
 def get_match(image, template):
+    # TODO: add image cropping
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
     template = np.array(template)
     t_w, t_h = template.shape[::-1]
