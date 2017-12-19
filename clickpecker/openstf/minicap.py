@@ -1,7 +1,9 @@
 import bitstring
 import io
+
 from PIL import Image
 from select import select
+from collections import namedtuple
 
 MinicapKeys = [
     "version", "header_size", "pid", "real_width", "real_height",

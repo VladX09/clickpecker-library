@@ -1,4 +1,4 @@
-from ..datatypes import Box, ContentBox
+from clickpecker.models.immutable import Box, ContentBox
 
 
 def _get_ligature_replaces():

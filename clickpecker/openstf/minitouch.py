@@ -1,10 +1,11 @@
 import socket
 import bitstring
 import io
-from select import select
-from collections import namedtuple
 import re
 import time
+
+from select import select
+from collections import namedtuple
 
 MinitouchBounds = namedtuple(
     "MinitouchBounds", ["max_contacts", "max_x", "max_y", "max_pressure"])
