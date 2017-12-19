@@ -74,7 +74,8 @@ def search_on_image(image, text, x_range=(0, 1), y_range=(0, 1),
         scorer=fuzz.UWRatio,
         score_cutoff=similarity)
     if (best_fit is not None):
-        print("best_fit: ", best_fit)
-    boxes = [box for box in boxes
-             if box.content == best_fit[0]] if best_fit is not None else []
+        # print("best_fit: ", best_fit)
+        boxes = [box for box in boxes if box.content == best_fit[0]]
+    else:
+        boxes = []
     return boxes
