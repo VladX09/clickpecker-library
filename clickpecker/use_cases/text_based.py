@@ -1,19 +1,17 @@
+import time
+
 from clickpecker.helpers import movements
 from clickpecker.recognition import ocr_engine
 from clickpecker.processing import utils
 
 
-def search(text, device_wrapper, crop_x_range=(0, 1), crop_y_range=(0, 1)):
-    return engine.search_on_image(device_wrapper.get_screenshot(), text,
-                                  crop_x_range, crop_y_range)
+def search(text, device_wrapper, crop_x_range, crop_y_range):
+    return ocr_engine.search_on_image(device_wrapper.get_screenshot(), text,
+                                      crop_x_range, crop_y_range)
 
 
-def find_performing_action(text,
-                           action,
-                           repeats,
-                           device_wrapper,
-                           crop_x_range=(0, 1),
-                           crop_y_range=(0, 1)):
+def find_performing_action(text, action, repeats, device_wrapper, crop_x_range,
+                           crop_y_range):
     for repeat in range(0, repeats):
         boxes = search(text, device_wrapper, crop_x_range, crop_y_range)
         if repeat + 1 == repeats:
@@ -24,11 +22,7 @@ def find_performing_action(text,
             action()
 
 
-def wait_for(text,
-             timeout,
-             device_wrapper,
-             crop_x_range=(0, 1),
-             crop_y_range=(0, 1)):
+def wait_for(text, timeout, device_wrapper, crop_x_range, crop_y_range):
     start_time = time.time()
     while (time.time() - start_time < timeout):
         boxes = search(text, device_wrapper, crop_x_range, crop_y_range)
@@ -39,12 +33,7 @@ def wait_for(text,
     return boxes
 
 
-def tap(text,
-        timeout=60,
-        index=0,
-        device_wrapper,
-        crop_x_range=(0, 1),
-        crop_y_range=(0, 1)):
+def tap(text, timeout, index, device_wrapper, crop_x_range, crop_y_range):
     _, max_x, max_y, max_pressure = device_wrapper.minitouch_header.bounds
     boxes = wait_for(text, timeout, device_wrapper, crop_x_range, crop_y_range)
     box = boxes[index].position
