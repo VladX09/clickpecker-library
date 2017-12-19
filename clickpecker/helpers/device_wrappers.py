@@ -6,29 +6,30 @@ import socket
 from clickpecker.openstf import minicap, minitouch
 
 
-def _get_minicap_header(url, minicap_port):
+def _get_minicap_header(minicap_address):
     with socket.socket() as sock:
-        sock.connect(url, minicap_port)
+        sock.connect((url, minicap_port))
         return minicap.read_header(sock)
 
 
-def _get_minitouch_header(url, minitouch_port):
+def _get_minitouch_header(minitouch_address):
     with socket.socket() as sock:
-        sock.connect(url, minitouch_port)
+        sock.connect((url, minitouch_port))
         return minitouch.read_header(sock)
 
 
 class DeviceWrapper(object):
     def __init__(self, device, url=""):
         self.device = device
-        self.device_url = url
-        self.minicap_header = _get_minicap_header(url, device.minicap_port)
-        self.minitouch_header = _get_minitouch_header(url,
-                                                      device.minitouch_port)
+        self.url = url
+        self.minicap_address = (url, self.device.minicap_port)
+        self.minitouch_address = (url, self.device.minitouch_port)
+        self.minicap_header = _get_minicap_header(self.minicap_address)
+        self.minitouch_header = _get_minitouch_header(self.minitouch_address)
 
     def get_screenshot(self):
         with socket.socket() as sock:
-            sock.connect(self.url, self.device.minicap_port)
+            sock.connect(self.minicap_address)
             header = minicap.read_header(sock)
             frame_size = bitstring.ConstBitStream(bytes=sock.recv(4))
             return minicap.read_frame(sock, frame_size.uintle)
