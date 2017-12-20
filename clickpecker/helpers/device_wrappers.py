@@ -8,13 +8,13 @@ from clickpecker.openstf import minicap, minitouch
 
 def _get_minicap_header(minicap_address):
     with socket.socket() as sock:
-        sock.connect((url, minicap_port))
+        sock.connect(minicap_address)
         return minicap.read_header(sock)
 
 
 def _get_minitouch_header(minitouch_address):
     with socket.socket() as sock:
-        sock.connect((url, minitouch_port))
+        sock.connect(minitouch_address)
         return minitouch.read_header(sock)
 
 
