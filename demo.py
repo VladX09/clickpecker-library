@@ -1,21 +1,17 @@
-import time
-
-from clickpecker.models.device import Device
 from clickpecker.helpers.device_wrappers import DeviceWrapper
 from clickpecker.recognition import tm_engine
 from clickpecker.api import BasicAPI
-from PIL import Image
 
-if __name__ == "__main__":
 
+
+def test_demo():
     device_spec = {
         "adb_id": "BL4B22D10786",
-        "minicap_port": 1313,
-        "minitouch_port": 1111
     }
+    device_manager_url = "http://127.0.0.1:5000"
 
-    dev = Device.from_dict(device_spec)
-    device_wrapper = DeviceWrapper(dev, "")
+    device_wrapper = DeviceWrapper.obtain_by_device_manager(
+        device_spec, device_manager_url)
     settings_ico = tm_engine.load_template("tm_img/settings_ico.png")
     api = BasicAPI(device_wrapper)
     api.adb("shell pm clear com.kms.free")

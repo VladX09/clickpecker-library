@@ -2,8 +2,10 @@ import shlex
 import bitstring
 import subprocess
 import socket
+import requests
 
 from clickpecker.openstf import minicap, minitouch
+from clickpecker.models.device import Device
 
 
 def _get_minicap_header(minicap_address):
@@ -26,6 +28,14 @@ class DeviceWrapper(object):
         self.minitouch_address = (url, self.device.minitouch_port)
         self.minicap_header = _get_minicap_header(self.minicap_address)
         self.minitouch_header = _get_minitouch_header(self.minitouch_address)
+
+    @classmethod
+    def obtain_by_device_manager(cls, device_specs, manager_url,
+                                 device_url=""):
+        r = requests.post(manager_url, json=device_specs)
+        device = Device.from_dict(r.json()[0])
+        wrapper = cls(device, device_url)
+        return wrapper
 
     def get_screenshot(self):
         with socket.socket() as sock:
