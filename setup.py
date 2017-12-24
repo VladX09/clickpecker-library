@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name = "Clickpecker",
     version = "0.1",
-    packages = find_packages("clickpecker"),
+    packages = find_packages(exclude=["tests"]),
     package_dir = {"":"clickpecker"},
 
     install_requires = [
