@@ -3,3 +3,4 @@
 **/__pycache__/
 **/.cache/
 engine_experiments/
+.python-version
