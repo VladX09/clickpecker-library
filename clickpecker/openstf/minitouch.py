@@ -15,6 +15,8 @@ MinitouchHeader = namedtuple("MinitouchHeader", ["version", "bounds", "pid"])
 
 def read_header(sock):
     data = sock.recv(1024)
+    if not data:
+        raise ConnectionError("No header received")
     lines = data.decode("utf-8").splitlines()
     header = {}
     for line in lines:

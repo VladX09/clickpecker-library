@@ -32,7 +32,10 @@ def read_header(sock):
     version = read_version(sock)
     if (version != 1):
         raise RuntimeError("Unsuppoted minicap version: {}".format(version))
-    header = bitstring.ConstBitStream(bytes=sock.recv(23))
+    data = sock.recv(23)
+    if not data:
+        raise ConnectionError("No header received")
+    header = bitstring.ConstBitStream(bytes=data)
     header = header.readlist(bytelist)
     header = [version] + header
     header = MinicapHeader(**dict(zip(MinicapKeys, header)))

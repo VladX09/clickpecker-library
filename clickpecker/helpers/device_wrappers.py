@@ -3,21 +3,33 @@ import bitstring
 import subprocess
 import socket
 import requests
+import time
 
 from clickpecker.openstf import minicap, minitouch
 from clickpecker.models.device import Device
 
 
+def _reconnect_on_error(func, address, timeout):
+    start_time = time.time()
+    while (time.time() - start_time < timeout):
+        with socket.socket() as sock:
+            sock.connect(address)
+            try:
+                result = func(sock)
+                return result
+            except ConnectionError as e:
+                sock.close()
+    raise ConnectionError("No header received")
+
+
 def _get_minicap_header(minicap_address):
-    with socket.socket() as sock:
-        sock.connect(minicap_address)
-        return minicap.read_header(sock)
+    header = _reconnect_on_error(minicap.read_header, minicap_address, 60)
+    return header
 
 
-def _get_minitouch_header(minitouch_address):
-    with socket.socket() as sock:
-        sock.connect(minitouch_address)
-        return minitouch.read_header(sock)
+def _get_minitouch_header(minitouch_address, timeout=60):
+    header = _reconnect_on_error(minitouch.read_header, minitouch_address, 60)
+    return header
 
 
 class DeviceWrapper(object):
@@ -28,14 +40,6 @@ class DeviceWrapper(object):
         self.minitouch_address = (url, self.device.minitouch_port)
         self.minicap_header = _get_minicap_header(self.minicap_address)
         self.minitouch_header = _get_minitouch_header(self.minitouch_address)
-
-    @classmethod
-    def obtain_by_device_manager(cls, device_specs, manager_url,
-                                 device_url=""):
-        r = requests.post(manager_url, json=device_specs)
-        device = Device.from_dict(r.json()[0])
-        wrapper = cls(device, device_url)
-        return wrapper
 
     def get_screenshot(self):
         with socket.socket() as sock:
