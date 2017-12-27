@@ -1,6 +1,6 @@
 **/*.jpg
-**/*-draft*
 **/__pycache__/
 **/.cache/
-engine_experiments/
 .python-version
+
+/dev_tools/*img*
