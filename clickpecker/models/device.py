@@ -1,3 +1,5 @@
+from packaging import version
+ 
 class Device:
     def __init__(self,
                  adb_id=None,
@@ -17,6 +19,14 @@ class Device:
         self.minitouch_port = minitouch_port
         self.stf_address = stf_address
 
+    @property
+    def android_version(self):
+        return self._android_version
+
+    @android_version.setter
+    def android_version(self, value):
+        self._android_version = None if value is None else version.parse(value)
+
     @classmethod
     def from_dict(cls, dict):
         allowed = ("adb_id", "device_name", "status", "android_version",
@@ -24,6 +34,11 @@ class Device:
                    "stf_address")
         args = {k: v for k, v in dict.items() if k in allowed}
         return cls(**args)
+
+    def to_dict(self):
+        data = dict(self.__dict__)
+        data["android_version"] = str(data.pop("_android_version", None))
+        return data
 
     def __repr__(self):
         return repr(self.__dict__)
