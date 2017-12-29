@@ -6,7 +6,6 @@ from clickpecker.processing import utils
 
 
 def search(text, device_wrapper, config):
-    # TODO: add invertion here
     return ocr_engine.search_on_image(device_wrapper.get_screenshot(), text,
                                       config)
 
@@ -24,14 +23,12 @@ def find_performing_action(text, action, repeats, device_wrapper, config):
 
 def wait_for(text, timeout, device_wrapper, config):
     start_time = time.time()
-    print("Called. arg = {}".format(text))
     while (time.time() - start_time < timeout):
         boxes = search(text, device_wrapper, config)
         if len(boxes) > 0:
             break
     if not boxes:
         raise (RuntimeError("Text '{}' not found".format(text)))
-    print("{}:({})".format(boxes, len(boxes)))
     return boxes
 
 
