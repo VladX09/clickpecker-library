@@ -5,45 +5,54 @@ from clickpecker.helpers import movements
 
 
 class BasicAPI(object):
-    def __init__(self, device_wrapper, resources=None):
+    def __init__(self, device_wrapper, default_config, resources=None):
         self.device_wrapper = device_wrapper
+        self.default_config = default_config
         self.resources = resources
 
-    def search(self, element, crop_x_range=(0, 1), crop_y_range=(0, 1)):
+    def merge_config(self, custom_config):
+        config = dict(self.default_config)
+        if custom_config is not None:
+            for k, v in custom_config.items():
+                config[k] = v
+        return config
+
+    def search(self, element, config=None):
+
+        config = self.merge_config(config)
+
         if isinstance(element, str):
-            return text_based.search(element, self.device_wrapper,
-                                     crop_x_range, crop_y_range)
+            return text_based.search(element, self.device_wrapper, config)
         else:
             raise TypeError(
                 "element must be a string, {} is given".format(type(element)))
 
-    def find_performing_action(self, element, action, repeats, crop_x_range,
-                               crop_y_range):
+    def find_performing_action(self, element, action, repeats, config=None):
+
+        config = self.merge_config(config)
+
         if isinstance(element, str):
             return text_based.find_performing_action(
-                element, action, repeats, self.device_wrapper, crop_x_range,
-                crop_y_range)
+                element, action, repeats, self.device_wrapper, config)
         else:
             raise TypeError(
                 "element must be a string, {} is given".format(type(element)))
 
-    def scroll_for(self,
-                   element,
-                   from_point_rel,
-                   to_point_rel,
-                   repeats=3,
-                   crop_x_range=(0, 1),
-                   crop_y_range=(0, 1)):
+    def scroll_for(self, element, from_point_rel, to_point_rel, config=None):
+
+        config = self.merge_config(config)
+        repeats = config["api_scroll_repeats"]
+
         minitouch_bounds = self.device_wrapper.minitouch_header.bounds
         movement = movements.scroll(minitouch_bounds, from_point_rel,
                                     to_point_rel)
         action = lambda: self.device_wrapper.perform_movement(movement)
-        return self.find_performing_action(element, action, repeats,
-                                           crop_x_range, crop_y_range)
+        return self.find_performing_action(element, action, repeats, config)
 
     def adb(self, command):
         return self.device_wrapper.adb(command)
 
+    # TODO: add argument for X and Y fixed position
     def swipe_down(self):
         minitouch_bounds = self.device_wrapper.minitouch_header.bounds
         movement = movements.scroll(minitouch_bounds, (0.5, 0), (0.5, 1))
@@ -64,30 +73,30 @@ class BasicAPI(object):
         movement = movements.scroll(minitouch_bounds, (0, 0.5), (1, 0.5))
         self.device_wrapper.perform_movement(movement)
 
-    def wait_for(self,
-                 element,
-                 timeout=60,
-                 crop_x_range=(0, 1),
-                 crop_y_range=(0, 1)):
+    def wait_for(self, element, config=None):
+
+        config = self.merge_config(config)
+        timeout = config["api_wait_timeout"]
+
         if isinstance(element, str):
             return text_based.wait_for(element, timeout, self.device_wrapper,
-                                       crop_x_range, crop_y_range)
+                                       config)
         else:
             raise TypeError(
                 "element must be a string, {} is given".format(type(element)))
 
-    def tap(self,
-            element,
-            timeout=60,
-            index=0,
-            crop_x_range=(0, 1),
-            crop_y_range=(0, 1)):
+    def tap(self, element, config=None):
+
+        config = self.merge_config(config)
+        timeout = config["api_tap_timeout"]
+        index = config["api_tap_index"]
+
         if isinstance(element, str):
             text_based.tap(element, timeout, index, self.device_wrapper,
-                           crop_x_range, crop_y_range)
+                           config)
             return
         if isinstance(element, Image.Image):
-            img_based.tap(element, self.device_wrapper)
+            img_based.tap(element, self.device_wrapper, config)
             return
         else:
             raise TypeError(

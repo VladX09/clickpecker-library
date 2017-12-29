@@ -13,7 +13,7 @@ def load_template(path):
     return Image.fromarray(cv2_img)
 
 
-def get_match(image, template):
+def get_match(image, template, config):
     # TODO: add image cropping
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
     template = np.array(template)
