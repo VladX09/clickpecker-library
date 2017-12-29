@@ -9,7 +9,7 @@ If any other parameters are necessary, processing function should be wrapped in 
 '''
 
 
-def binary_thresholder(zoom_x=2, zoom_y=2, threshold=200, invert=False):
+def basic_binarisation(zoom_x=2, zoom_y=2, threshold=200, invert=False):
     def preproc_fun(pil_image):
         cv2_img = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2GRAY)
         cv2_img = cv2.resize(

@@ -1,4 +1,4 @@
-from clickpecker.processing.image_processing import binary_thresholder
+from clickpecker.processing.image_processing import basic_binarisation
 from clickpecker.processing.boxes_processing import basic_postprocessing
 from tesserocr import PyTessBaseAPI, RIL, PSM
 
@@ -9,7 +9,7 @@ default_config = {
     "api_wait_timeout": 60,
     "api_tap_timeout": 60,
     "api_tap_index": 0,
-    "ocr_preprocessing": binary_thresholder(),
+    "ocr_preprocessing": basic_binarisation(),
     "ocr_postprocessing": basic_postprocessing,
     "ocr_similarity_cutoff": 90,
     "ocr_GetComponentImages_params": {
