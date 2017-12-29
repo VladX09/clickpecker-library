@@ -46,8 +46,7 @@ def _get_content_boxes(image,
 def parse(image,
           x_range=(0, 1),
           y_range=(0, 1),
-          preproc=image_processing.binary_thresholder(
-              zoom_x=2, zoom_y=2, threshold=200),
+          preproc=image_processing.binary_thresholder(),
           postproc=boxes_processing.basic_postprocessing,
           **gcb_params):
 
@@ -67,15 +66,26 @@ def parse(image,
 
 
 def search_on_image(image, text, x_range=(0, 1), y_range=(0, 1),
-                    similarity=90):
+                    similarity=85):
+    def find_best(boxes):
+        best_fit = process.extractOne(
+            text, [box.content for box in boxes],
+            scorer=fuzz.UWRatio,
+            score_cutoff=similarity)
+
+        if (best_fit is not None):
+            boxes = [box for box in boxes if box.content == best_fit[0]]
+        else:
+            boxes = []
+        return boxes
+
     boxes = parse(image, x_range, y_range)
-    best_fit = process.extractOne(
-        text, [box.content for box in boxes],
-        scorer=fuzz.UWRatio,
-        score_cutoff=similarity)
-    if (best_fit is not None):
-        # print("best_fit: ", best_fit)
-        boxes = [box for box in boxes if box.content == best_fit[0]]
-    else:
-        boxes = []
-    return boxes
+    best_fit = find_best(boxes)
+    if len(best_fit) == 0:
+        boxes = parse(
+            image,
+            x_range,
+            y_range,
+            preproc=image_processing.binary_thresholder(invert=True))
+        best_fit = find_best(boxes)
+    return best_fit
