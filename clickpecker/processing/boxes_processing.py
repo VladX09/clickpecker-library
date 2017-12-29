@@ -77,3 +77,7 @@ def compose_in_lines(content_boxes, threshold=0.6):
 
 def basic_postprocessing(content_boxes):
     return compose_in_lines(filter_junk(replace_ligatures(content_boxes)))
+
+
+def filter_postprocessing(content_boxes):
+    return filter_junk(replace_ligatures(content_boxes))
