@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw
 
 import clickpecker.recognition.ocr_engine as engine
 import clickpecker.processing.boxes_processing as postprocessing
+from clickpecker.configurations import default_config
 
 
 def configure_parser():
@@ -33,17 +34,14 @@ def load_images(input_path):
             result = dict(zip(names, imgs))
     else:
         img = Image.open(input_path)
-        result = {input_path.name : img}
+        result = {input_path.name: img}
     return result
 
-def perform_ocr(named_images,
-                crop_x_range=(0, 1),
-                crop_y_range=(0, 1),
-                **gcb_params):
+
+def perform_ocr(named_images, config):
     ocr_result = {}
     for name, img in named_images.items():
-        boxes = engine.parse(
-            img, x_range=crop_x_range, y_range=crop_y_range, **gcb_params)
+        boxes = engine.parse(img, config)
         ocr_result[name] = boxes
     return ocr_result
 
@@ -79,6 +77,10 @@ if __name__ == "__main__":
     imgs = load_images(input_path)
     crop_x_range, crop_y_range = (args.crop[0], args.crop[1]), (args.crop[2],
                                                                 args.crop[3])
-    ocr_res = perform_ocr(imgs, crop_x_range, crop_y_range)
+    config = dict(default_config)
+    config["crop_x_range"] = crop_x_range
+    config["crop_y_range"] = crop_y_range
+    config["ocr_postprocessing"] = postprocessing.filter_postprocessing
+    ocr_res = perform_ocr(imgs, config)
     save_parsed_text(ocr_res, output_dir / "txt")
     draw_boxes(imgs, ocr_res, output_dir / "img")
