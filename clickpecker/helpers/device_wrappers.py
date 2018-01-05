@@ -7,6 +7,7 @@ import time
 
 from clickpecker.openstf import minicap, minitouch
 from clickpecker.models.device import Device
+from clickpecker.processing import image_processing
 
 
 def _reconnect_on_error(func, address, timeout):
@@ -33,20 +34,35 @@ def _get_minitouch_header(minitouch_address, timeout=60):
 
 
 class DeviceWrapper(object):
-    def __init__(self, device, url=""):
+    def __init__(self,
+                 device,
+                 url="",
+                 screen_loging=True,
+                 similarity_fun=image_processing.check_ssim_similar(
+                     treshold=0.9, multichannel=True)):
         self.device = device
         self.url = url
         self.minicap_address = (url, self.device.minicap_port)
         self.minitouch_address = (url, self.device.minitouch_port)
         self.minicap_header = _get_minicap_header(self.minicap_address)
         self.minitouch_header = _get_minitouch_header(self.minitouch_address)
+        self.screen_history = []
+        self.screen_logging = screen_loging
+        self.similarity_fun = similarity_fun
 
     def get_screenshot(self):
         with socket.socket() as sock:
             sock.connect(self.minicap_address)
             header = minicap.read_header(sock)
             frame_size = bitstring.ConstBitStream(bytes=sock.recv(4))
-            return minicap.read_frame(sock, frame_size.uintle)
+            frame = minicap.read_frame(sock, frame_size.uintle)
+
+            # Save screen history log
+            if (self.screen_logging and
+                (len(self.screen_history) == 0
+                 or not self.similarity_fun(frame, self.screen_history[-1]))):
+                self.screen_history.append(frame)
+            return frame
 
     def perform_movement(self, movement_list):
         with socket.socket() as sock:

@@ -2,11 +2,31 @@ import PIL
 import cv2
 import numpy as np
 
+from skimage.measure import compare_mse
+from skimage.measure import compare_ssim
+
 from clickpecker.models.immutable import Box
 from clickpecker.processing import utils
 '''All preprocessing fuctions are considered to receive PIL image as an input argument.
 If any other parameters are necessary, processing function should be wrapped in a closure.
 '''
+
+
+def check_mse_similar(threshold):
+    def comparator(image_a, image_b):
+        similarity = compare_mse(np.array(image_a), np.array(image_b))
+        return similarity <= threshold
+
+    return comparator
+
+
+def check_ssim_similar(treshold, **ssim_kwargs):
+    def comparator(image_a, image_b):
+        similarity = compare_ssim(
+            np.array(image_a), np.array(image_b), **ssim_kwargs)
+        return similarity >= treshold
+
+    return comparator
 
 
 def basic_binarisation(zoom_x=2, zoom_y=2, threshold=200, invert=False):
