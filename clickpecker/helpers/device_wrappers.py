@@ -10,6 +10,7 @@ from clickpecker.models.device import Device
 from clickpecker.processing import image_processing
 from collections import OrderedDict
 from datetime import datetime
+from clickpecker.configurations import default_config
 
 
 def _reconnect_on_error(func, address, timeout):
@@ -36,12 +37,7 @@ def _get_minitouch_header(minitouch_address, timeout=60):
 
 
 class DeviceWrapper:
-    def __init__(self,
-                 device,
-                 url="",
-                 screen_loging=True,
-                 similarity_fun=image_processing.check_ssim_similar(
-                     treshold=0.9, multichannel=True)):
+    def __init__(self, device, url="", screen_loging=True, config=default_config):
         self.device = device
         self.url = url
         self.minicap_address = (url, self.device.minicap_port)
@@ -50,7 +46,9 @@ class DeviceWrapper:
         self.minitouch_header = _get_minitouch_header(self.minitouch_address)
         self.screen_history = OrderedDict()
         self.screen_logging = screen_loging
-        self.similarity_fun = similarity_fun
+        similarity_fun = config["device_wrapper_similarity_fun"]
+        similarity_threshold = config["device_wrapper_similarity_threshold"]
+        self.similarity_comparator = similarity_fun(similarity_threshold)
 
     def save_screenshot(self, screenshot, tag=None):
         if tag is None:
@@ -75,8 +73,8 @@ class DeviceWrapper:
         frame = self.load_frame()
         if len(self.screen_history) != 0:
             last_screenshot = list(self.screen_history.values())[-1]
-            if (self.screen_logging
-                    and not self.similarity_fun(frame, last_screenshot)):
+            if (self.screen_logging and
+                    not self.similarity_comparator(frame, last_screenshot)):
                 self.save_screenshot(frame)
         else:
             self.save_screenshot(frame)
