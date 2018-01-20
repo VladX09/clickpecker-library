@@ -1,5 +1,6 @@
 from PIL import Image
 
+import contextlib
 from clickpecker.use_cases import text_based, img_based
 from clickpecker.helpers import movements
 
@@ -102,3 +103,39 @@ class BasicAPI(object):
             raise TypeError(
                 "element must be either a string or a PIL.Image, {} is given".
                 format(type(element)))
+
+    def save_current_screen(self, tag=None):
+        self.device_wrapper.save_current_screen(tag)
+
+    def screen_similar_with(self, tag, config=None):
+        config = self.merge_config(config)
+
+        similarity_fun= config["api_similarity_fun"]
+        similarity_threshold = config["api_similarity_threshold"]
+        similarity_comparator = similarity_fun(similarity_threshold)
+
+        current_screen = self.device_wrapper.get_screenshot()
+        saved_screen = self.device_wrapper.screen_history[tag]
+        return similarity_comparator(current_screen, saved_screen)
+
+    @contextlib.contextmanager
+    def assert_screen_change(self, config=None):
+        config = self.merge_config(config)
+
+        # Save current screenshot with unique tag
+        tag = self.device_wrapper.save_current_screen()
+        # Perform any testing process
+        yield
+        # Raise error if screen was not changed
+        assert not self.screen_similar_with(tag, config), "Screen wasn't changed"
+
+    @contextlib.contextmanager
+    def assert_screen_same(self, config=None):
+        config = self.merge_config(config)
+
+        # Save current screenshot with unique tag
+        tag = self.device_wrapper.save_current_screen()
+        # Perform any testing process
+        yield
+        # Raise error if screen was changed
+        assert self.screen_similar_with(tag, config), "Screen was changed"
