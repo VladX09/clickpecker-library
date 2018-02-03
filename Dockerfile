@@ -28,4 +28,4 @@ ENV PATH /root/platform-tools:$PATH
 WORKDIR /workdir
 CMD python3.6 -m pip install -e /clickpecker > /dev/null \
     && python3.6 -m pip install -e /clickpecker-pytest > /dev/null \
-    && /bin/bash
+    && sleep infinity
