@@ -1,5 +1,5 @@
 from packaging import version
- 
+
 class Device:
     def __init__(self,
                  adb_id=None,
