@@ -37,7 +37,27 @@ def _get_minitouch_header(minitouch_address, timeout=60):
 
 
 class DeviceWrapper:
-    def __init__(self, device, url="", screen_loging=True, config=default_config):
+    """This class is used to interact with the test device
+
+    Attributes:
+        device: :class:`models.Device` object, containing device info
+        url: Address of the host connected to the device
+        minicap_address: Address of minicap server
+        minitouch_address: Address of minicap server
+        minicap_header: Namedtuple containing minicap protocol header
+        minitouch_header: Namedtuple containing minitouch protocol header
+        screen_history: Dictionary containing device's screenshot history in ``{str:PIL.Image}`` format
+        screen_loging: Spicifies should device's screenshot history be saved or not
+        config: Configuration dictionary containing ``device_wrapper_similarity_fun``
+                and ``device_wrapper_similarity_threshold`` (see :doc:`configuration`)
+
+    """
+
+    def __init__(self,
+                 device,
+                 url="",
+                 screen_loging=True,
+                 config=default_config):
         self.device = device
         self.url = url
         self.minicap_address = (url, self.device.minicap_port)
@@ -48,15 +68,31 @@ class DeviceWrapper:
         self.screen_logging = screen_loging
         similarity_fun = config["device_wrapper_similarity_fun"]
         similarity_threshold = config["device_wrapper_similarity_threshold"]
+        # TODO: make private
         self.similarity_comparator = similarity_fun(similarity_threshold)
 
     def save_screenshot(self, screenshot, tag=None):
+        """Save given screenshot in the history dictionary with the given tag.
+
+        If tag is ``None``, it will be generated from current time automatically.
+
+        Returns:
+            Tag of the saved screenshot.
+
+        """
+
         if tag is None:
             tag = datetime.now().strftime("%Y-%m-%d_%H:%M:%S.%f")
         self.screen_history[tag] = screenshot
         return tag
 
     def load_frame(self):
+        """Load current minicap frame.
+
+        Returns:
+            :class:`PIL.Image` object
+
+        """
         with socket.socket() as sock:
             sock.connect(self.minicap_address)
             header = minicap.read_header(sock)
@@ -65,11 +101,32 @@ class DeviceWrapper:
             return frame
 
     def save_current_screen(self, tag=None):
+        """Save current screenshot in the history dictionary with the given tag.
+
+        If tag is ``None``, it will be generated from current time automatically.
+
+        Returns:
+            Tag of the saved screenshot.
+
+        """
+
         frame = self.load_frame()
         tag = self.save_screenshot(frame, tag)
         return tag
 
     def get_screenshot(self):
+        """Get current screenshot.
+
+        If :attr:`screen_logging` is ``True``, current screenshot will be saved to :attr:`screen_history`
+        (if it differs from the last saved screenshot).
+        Comparsion is configured via ``device_wrapper_similarity_fun``
+        and ``device_wrapper_similarity_threshold`` (see :doc:`configuration`).
+
+        Returns:
+            :class:`PIL.Image` object
+
+        """
+
         frame = self.load_frame()
         if len(self.screen_history) != 0:
             last_screenshot = list(self.screen_history.values())[-1]
@@ -81,10 +138,28 @@ class DeviceWrapper:
         return frame
 
     def perform_movement(self, movement_list):
+        """Perform movement on device's screen via minitouch.
+
+        Arguments:
+            movement_list: list of strings, acceptible by `minitouch <https://github.com/openstf/minitouch>`_.
+                           Common movements are listed in :mod:`helpers.movements`.
+
+        """
+
         with socket.socket() as sock:
             sock.connect(self.minitouch_address)
             minitouch.send_commands(sock, movement_list)
 
     def adb(self, command):
+        """Perform ADB command.
+
+        Args:
+            command: ADB command arguments (without `adb -s <id>`)
+
+        Returns:
+            :class:`subprocess.CompletedProcess` object
+
+        """
+
         cmd = "adb -s {0} {1}".format(self.device.adb_id, command)
         return subprocess.run(shlex.split(cmd), stdout=subprocess.PIPE)
