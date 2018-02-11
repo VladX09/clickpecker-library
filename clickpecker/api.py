@@ -9,7 +9,7 @@ class BasicAPI(object):
     """Basic API class which is used to perform actions on the testing device.
 
     Attributes:
-        device_wrapper: :class:`helpers.device_wrappers.DeviceWrapper` object
+        device_wrapper: :class:`clickpecker.helpers.DeviceWrapper` object
         default_config: Dictonary with all necessary variables (see :doc:`configuration`)
 
     """

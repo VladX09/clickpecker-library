@@ -5,15 +5,15 @@ Most of API functions can be configured via special config dictionary.
 
 Config merging
 --------------
-Class :class:`api.BasicAPI` is initialised  by default configuration which can be overrided locally for some methods. If local config is passed to such methods, it will be merged with default config, and merge result will be used. Merged config will not affect other methods.
+Class :class:`clickpecker.BasicAPI` is initialised  by default configuration which can be overrided locally for some methods. If local config is passed to such methods, it will be merged with default config, and merge result will be used. Merged config will not affect other methods.
 
-**Warning!** Base your custom configuration dictionaries on :data:`configurations.default_config` to avoid missing some parameters.
+**Warning!** Base your custom configuration dictionaries on :data:`clickpecker.configurations.default_config` to avoid missing some parameters.
 
 
 Default config parameters
 -------------------------
 
-Here's an example of default config from :data:`configurations`::
+Here's an example of default config from :data:`clickpecker.configurations`::
 
   default_config = {
     "crop_x_range": (0, 1),
@@ -43,13 +43,13 @@ crop_x_range/crop_y_range
   Value: a pair of real numbers from 0 to 1.
 
 api_scroll_repeats
-  Used in :meth:`api.BasicAPI.scroll_for`. Maximum number of unsuccessfull scrolls before raising the exception
+  Used in :meth:`clickpecker.BasicAPI.scroll_for`. Maximum number of unsuccessfull scrolls before raising the exception
 
 api_wait_timeout
-  Used in :meth:`api.BasicAPI.wait_for` and. Maximum wait timeout before raising the exception.
+  Used in :meth:`clickpecker.BasicAPI.wait_for` and. Maximum wait timeout before raising the exception.
 
 api_tap_timeout
-  Same as :data:`api_wait_timeout` but used in :meth:`api.BasicAPI.tap`.
+  Same as :data:`api_wait_timeout` but used in :meth:`clickpecker.BasicAPI.tap`.
 
 api_tap_index
   Specifies which element occurrence will be chosen if several were found.

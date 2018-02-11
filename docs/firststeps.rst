@@ -42,7 +42,7 @@ Current template matcher hasn't got any thresholds and it can't detect if there'
 image on the screen. That's why some methods (e.g. ``search``, ``wait_for``, ``scroll_for``)
 aren't accept images.
 
-The main object of Clickpecker is :class:`api.BasicAPI`. To init API, you should have
+The main object of Clickpecker is :class:`clickpecker.BasicAPI`. To init API, you should have
 `DeviceWrapper` object and a dictionary with the default configuration.
 
 .. code-block:: python
@@ -107,7 +107,7 @@ the state of an application under testing. These methods are based
 on the human way of visual observing.
 
 First of all, text-based UI assertions can be made by
-:meth:`api.BasicAPI.search` method::
+:meth:`clickpecker.BasicAPI.search` method::
 
     assert len(api.search("OK")) != 0  # Assert OK button presents on screen
 

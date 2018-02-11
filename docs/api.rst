@@ -4,10 +4,10 @@ API Reference
 
 API
 ===
-.. automodule:: api
+.. autoclass:: clickpecker.BasicAPI
   :members:
 
 Device communication
 ====================
-.. automodule:: helpers.device_wrappers
+.. autoclass:: clickpecker.helpers.DeviceWrapper
    :members:
