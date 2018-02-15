@@ -2,5 +2,5 @@
 **/__pycache__/
 **/.cache/
 .python-version
-
+clickpecker.egg-info/
 /dev_tools/*img*
