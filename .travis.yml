@@ -1,0 +1,19 @@
+sudo: required
+
+services:
+  - docker
+
+language: python
+
+python:
+  - "3.6"
+
+branches:
+  only:
+    - master
+
+script:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - docker build -t $REPO:latest_nosrc .
+  - docker tag $REPO:latest_nosrc $REPO:latest
+  - docker push $REPO

@@ -3,7 +3,8 @@ VOLUME /workdir
 VOLUME /clickpecker
 VOLUME /clickpecker-pytest
 COPY requirements.txt /root/
-RUN apt-get update && apt-get install -y \
+COPY ./requirements/* /root/requirements/
+RUN apt-get update -qq && apt-get install -yqq \
       curl \
       libleptonica-dev \
       libsm6 \
@@ -14,13 +15,13 @@ RUN apt-get update && apt-get install -y \
       tesseract-ocr \
       unzip \
     && add-apt-repository ppa:jonathonf/python-3.6 \
-    && apt-get update && apt-get install -y \
+    && apt-get update -qq && apt-get install -yqq \
        python3.6 \
        python3.6-dev \
        python3-pip \
        python3.6-venv
-RUN python3.6 -m pip install --upgrade pip \
-    && python3.6 -m pip install -r /root/requirements.txt
+RUN python3.6 -m pip install -q --upgrade pip \
+    && python3.6 -m pip install -r /root/requirements.txt -q
 RUN curl -o /root/platform-tools.zip https://dl.google.com/android/repository/platform-tools-latest-linux.zip \
     && unzip /root/platform-tools.zip -d /root/ \ 
     && rm /root/platform-tools.zip
