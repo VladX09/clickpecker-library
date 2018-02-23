@@ -13,6 +13,7 @@ branches:
     - master
 
 install:
+  - echo "Skip install phase"
 
 script:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
