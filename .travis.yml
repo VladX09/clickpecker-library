@@ -12,6 +12,8 @@ branches:
   only:
     - master
 
+install:
+
 script:
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
   - docker build -t $REPO:latest_nosrc .
