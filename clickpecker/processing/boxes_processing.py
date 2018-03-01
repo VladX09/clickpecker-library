@@ -47,13 +47,15 @@ def compose_in_lines(content_boxes, threshold=0.6):
         end_x = line[-1].position.x + line[-1].position.w
         end_y = line[-1].position.y + line[-1].position.h
         line_box = Box(start_x, start_y, end_x - start_x, end_y - start_y)
-        line_content = "".join(["{} ".format(box.content)
-                                for box in line]).strip()
+        line_content = "".join(
+            ["{} ".format(box.content) for box in line]).strip()
         return ContentBox(line_content, line_box)
 
     lines = []
     line = []
     for box in sorted(content_boxes, key=lambda box: box.position.y):
+        if box.position.h > 2 * box.position.w:
+            continue
         if not line:
             y_up = box.position.y
             y_down = y_up + box.position.h
