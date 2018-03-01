@@ -80,7 +80,6 @@ if __name__ == "__main__":
     config = dict(default_config)
     config["crop_x_range"] = crop_x_range
     config["crop_y_range"] = crop_y_range
-    config["ocr_postprocessing"] = postprocessing.filter_postprocessing
     ocr_res = perform_ocr(imgs, config)
     save_parsed_text(ocr_res, output_dir / "txt")
     draw_boxes(imgs, ocr_res, output_dir / "img")
