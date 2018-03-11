@@ -7,7 +7,7 @@ import numpy as np
 
 from PIL import Image
 from clickpecker.processing import utils
-from clickpecker.processing.image_processing import binary_thresholder
+from clickpecker.processing.image_processing import basic_binarisation
 
 
 def configure_parser():
@@ -38,11 +38,10 @@ def load_images(input_path):
 
 
 def binarize(named_images, x_range=(0, 1), y_range=(0, 1)):
-    preproc = binary_thresholder()
+    preproc = basic_binarisation()
     res = {}
     for name, img in named_images.items():
         img = preproc(img)
-        img = invert(img)
         w, h = img.size
         img = img.crop((x_range[0] * w, y_range[0] * h, x_range[1] * w,
                                 y_range[1] * h))
