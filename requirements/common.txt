@@ -11,7 +11,7 @@ networkx==2.1
 numpy==1.14.0
 opencv-python==3.4.0.12
 packaging==16.8
-Pillow==5.0.0
+Pillow==9.0.1
 pluggy==0.6.0
 py==1.5.2
 pyparsing==2.2.0
